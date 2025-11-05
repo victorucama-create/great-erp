@@ -1,0 +1,1345 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Great ERP - Sistema de Gestão Empresarial</title>
+    <style>
+        :root {
+            --primary: #007BFF;
+            --primary-dark: #0056b3;
+            --primary-light: #4dabf7;
+            --secondary: #6c757d;
+            --success: #28a745;
+            --danger: #dc3545;
+            --warning: #ffc107;
+            --info: #17a2b8;
+            --light: #f8f9fa;
+            --dark: #343a40;
+            --gray-100: #f8f9fa;
+            --gray-200: #e9ecef;
+            --gray-300: #dee2e6;
+            --gray-400: #ced4da;
+            --gray-500: #adb5bd;
+            --gray-600: #6c757d;
+            --gray-700: #495057;
+            --gray-800: #343a40;
+            --gray-900: #212529;
+            --border-radius: 8px;
+            --box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            --transition: all 0.3s ease;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: var(--gray-100);
+            color: var(--gray-800);
+            line-height: 1.6;
+        }
+
+        /* Layout Principal */
+        .app-container {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        .sidebar {
+            width: 250px;
+            background: linear-gradient(to bottom, var(--primary), var(--primary-dark));
+            color: white;
+            transition: var(--transition);
+            box-shadow: var(--box-shadow);
+            z-index: 100;
+        }
+
+        .sidebar-header {
+            padding: 20px;
+            text-align: center;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .sidebar-header h2 {
+            font-size: 1.5rem;
+            font-weight: 600;
+        }
+
+        .sidebar-menu {
+            padding: 20px 0;
+        }
+
+        .menu-item {
+            padding: 12px 20px;
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+            transition: var(--transition);
+            border-left: 4px solid transparent;
+        }
+
+        .menu-item:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+            border-left-color: white;
+        }
+
+        .menu-item.active {
+            background-color: rgba(255, 255, 255, 0.15);
+            border-left-color: white;
+        }
+
+        .menu-item i {
+            margin-right: 10px;
+            font-size: 1.2rem;
+        }
+
+        .main-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .top-bar {
+            background-color: white;
+            padding: 15px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: var(--box-shadow);
+            z-index: 99;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+        }
+
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background-color: var(--primary);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 10px;
+            font-weight: bold;
+        }
+
+        .page-content {
+            flex: 1;
+            padding: 30px;
+            overflow-y: auto;
+        }
+
+        .page-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+
+        .page-title {
+            font-size: 1.8rem;
+            font-weight: 600;
+            color: var(--gray-800);
+        }
+
+        .page-actions button {
+            margin-left: 10px;
+        }
+
+        /* Componentes */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background-color: white;
+            border-radius: var(--border-radius);
+            padding: 20px;
+            box-shadow: var(--box-shadow);
+            transition: var(--transition);
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .stat-value {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 5px;
+        }
+
+        .stat-label {
+            color: var(--gray-600);
+            font-size: 0.9rem;
+        }
+
+        .data-table {
+            width: 100%;
+            background-color: white;
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+            overflow: hidden;
+        }
+
+        .table-header {
+            padding: 20px;
+            border-bottom: 1px solid var(--gray-300);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .table-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th, td {
+            padding: 15px;
+            text-align: left;
+            border-bottom: 1px solid var(--gray-300);
+        }
+
+        th {
+            background-color: var(--gray-100);
+            font-weight: 600;
+            color: var(--gray-700);
+        }
+
+        tr:hover {
+            background-color: var(--gray-100);
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: var(--border-radius);
+            cursor: pointer;
+            font-weight: 500;
+            transition: var(--transition);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .btn i {
+            margin-right: 8px;
+        }
+
+        .btn-primary {
+            background-color: var(--primary);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background-color: var(--primary-dark);
+        }
+
+        .btn-success {
+            background-color: var(--success);
+            color: white;
+        }
+
+        .btn-success:hover {
+            background-color: #218838;
+        }
+
+        .btn-danger {
+            background-color: var(--danger);
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background-color: #c82333;
+        }
+
+        .btn-outline {
+            background-color: transparent;
+            border: 1px solid var(--primary);
+            color: var(--primary);
+        }
+
+        .btn-outline:hover {
+            background-color: var(--primary);
+            color: white;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: var(--gray-700);
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid var(--gray-300);
+            border-radius: var(--border-radius);
+            font-size: 1rem;
+            transition: var(--transition);
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.25);
+        }
+
+        /* Login Screen */
+        .login-container {
+            display: flex;
+            min-height: 100vh;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+        }
+
+        .login-left {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 40px;
+            color: white;
+        }
+
+        .login-logo {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 20px;
+        }
+
+        .login-slogan {
+            font-size: 1.2rem;
+            text-align: center;
+            max-width: 500px;
+        }
+
+        .login-right {
+            flex: 1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-color: white;
+            border-radius: 20px 0 0 20px;
+            box-shadow: -5px 0 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .login-form {
+            width: 100%;
+            max-width: 400px;
+            padding: 40px;
+        }
+
+        .login-title {
+            font-size: 2rem;
+            font-weight: 600;
+            margin-bottom: 10px;
+            color: var(--gray-800);
+        }
+
+        .login-subtitle {
+            color: var(--gray-600);
+            margin-bottom: 30px;
+        }
+
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 1000;
+        }
+
+        .modal-content {
+            background: white;
+            margin: 5% auto;
+            padding: 30px;
+            border-radius: var(--border-radius);
+            width: 90%;
+            max-width: 600px;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .close {
+            font-size: 2rem;
+            cursor: pointer;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+
+        /* Utilitários */
+        .hidden {
+            display: none;
+        }
+
+        .trend-up {
+            color: var(--success);
+        }
+
+        .trend-down {
+            color: var(--danger);
+        }
+
+        .badge {
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 0.8rem;
+            font-weight: 500;
+        }
+
+        .badge-success {
+            background: var(--success);
+            color: white;
+        }
+
+        .badge-warning {
+            background: var(--warning);
+            color: black;
+        }
+
+        .badge-danger {
+            background: var(--danger);
+            color: white;
+        }
+
+        .badge-info {
+            background: var(--info);
+            color: white;
+        }
+
+        /* Ícones */
+        .fa {
+            display: inline-block;
+            font-style: normal;
+            font-variant: normal;
+            text-rendering: auto;
+            line-height: 1;
+        }
+
+        .fa-chart-bar:before { content: "📊"; }
+        .fa-building:before { content: "🏢"; }
+        .fa-users:before { content: "👥"; }
+        .fa-box:before { content: "📦"; }
+        .fa-cogs:before { content: "⚙️"; }
+        .fa-chart-line:before { content: "📈"; }
+        .fa-user-tie:before { content: "👔"; }
+        .fa-shopping-cart:before { content: "🛒"; }
+        .fa-industry:before { content: "🏭"; }
+        .fa-handshake:before { content: "🤝"; }
+        .fa-bars:before { content: "☰"; }
+        .fa-bell:before { content: "🔔"; }
+        .fa-search:before { content: "🔍"; }
+        .fa-plus:before { content: "+"; }
+        .fa-edit:before { content: "✏️"; }
+        .fa-trash:before { content: "🗑️"; }
+        .fa-eye:before { content: "👁️"; }
+        .fa-arrow-up:before { content: "↑"; }
+        .fa-arrow-down:before { content: "↓"; }
+        .fa-home:before { content: "🏠"; }
+        .fa-sign-out-alt:before { content: "🚪"; }
+        .fa-credit-card:before { content: "💳"; }
+        .fa-check:before { content: "✓"; }
+        .fa-file-invoice:before { content: "🧾"; }
+        .fa-warehouse:before { content: "🏭"; }
+        .fa-tools:before { content: "🛠️"; }
+        .fa-money-bill:before { content: "💰"; }
+        .fa-save:before { content: "💾"; }
+        .fa-times:before { content: "✕"; }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .app-container {
+                flex-direction: column;
+            }
+
+            .sidebar {
+                width: 100%;
+                height: auto;
+            }
+
+            .sidebar-menu {
+                display: flex;
+                overflow-x: auto;
+                padding: 10px;
+            }
+
+            .menu-item {
+                flex-shrink: 0;
+                border-left: none;
+                border-bottom: 4px solid transparent;
+                padding: 10px 15px;
+            }
+
+            .menu-item:hover, .menu-item.active {
+                border-left: none;
+                border-bottom-color: white;
+            }
+
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .page-header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .page-actions {
+                margin-top: 15px;
+                width: 100%;
+            }
+
+            .page-actions button {
+                width: 100%;
+                margin: 5px 0;
+            }
+
+            .login-container {
+                flex-direction: column;
+            }
+
+            .login-right {
+                border-radius: 20px 20px 0 0;
+                margin-top: -20px;
+                padding: 20px;
+            }
+
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Tela de Login -->
+    <div id="login-screen" class="login-container">
+        <div class="login-left">
+            <div class="login-logo">Great ERP</div>
+            <div class="login-slogan">
+                Sistema de Gestão Empresarial Integrado para PMEs. 
+                Centralize a gestão financeira, contábil, operacional e comercial.
+            </div>
+            <div style="margin-top: 30px; text-align: center;">
+                <div style="font-size: 1.5rem; font-weight: 600; margin-bottom: 15px;">Planos desde 3.500,00 MZN/mês</div>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 20px;">
+                    <div>✓ Utilizadores ilimitados</div>
+                    <div>✓ Armazéns ilimitados</div>
+                    <div>✓ Gestão completa</div>
+                    <div>✓ Suporte técnico</div>
+                </div>
+            </div>
+        </div>
+        <div class="login-right">
+            <div class="login-form">
+                <h2 class="login-title">Entrar no Sistema</h2>
+                <p class="login-subtitle">Acesse sua conta ou registre uma nova empresa</p>
+                
+                <div class="form-group">
+                    <label for="email">E-mail</label>
+                    <input type="email" id="email" class="form-control" placeholder="seu@email.com" value="admin@greaterp.com">
+                </div>
+                
+                <div class="form-group">
+                    <label for="password">Senha</label>
+                    <input type="password" id="password" class="form-control" placeholder="Sua senha" value="123456">
+                </div>
+                
+                <button class="btn btn-primary" style="width: 100%; margin-bottom: 15px;" onclick="login()">
+                    Entrar no Sistema
+                </button>
+                
+                <div class="text-center">
+                    <a href="#" onclick="showScreen('onboarding-screen')" style="color: var(--primary); text-decoration: none;">Criar nova empresa</a> 
+                </div>
+
+                <!-- Credenciais de Demo -->
+                <div style="margin-top: 30px; padding: 15px; background: var(--gray-100); border-radius: var(--border-radius); font-size: 0.9rem;">
+                    <strong>Credenciais de Demonstração:</strong><br>
+                    Super Admin: admin@greaterp.com / 123456<br>
+                    Usuário: joao@empresa.com / 123456
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Dashboard Principal -->
+    <div id="dashboard-screen" class="app-container hidden">
+        <!-- Sidebar -->
+        <div class="sidebar">
+            <div class="sidebar-header">
+                <h2>Great ERP</h2>
+                <div style="font-size: 0.8rem; opacity: 0.8;" id="sidebar-company">Minha Empresa</div>
+            </div>
+            <div class="sidebar-menu">
+                <div class="menu-item active" onclick="showScreen('dashboard-screen')">
+                    <i class="fa fa-home"></i> Dashboard
+                </div>
+                <div class="menu-item" onclick="showScreen('sales-screen')">
+                    <i class="fa fa-shopping-cart"></i> Vendas
+                </div>
+                <div class="menu-item" onclick="showScreen('inventory-screen')">
+                    <i class="fa fa-box"></i> Inventário
+                </div>
+                <div class="menu-item" onclick="showScreen('mrp-screen')">
+                    <i class="fa fa-industry"></i> Produção (MRP)
+                </div>
+                <div class="menu-item" onclick="showScreen('crm-screen')">
+                    <i class="fa fa-users"></i> CRM
+                </div>
+                <div class="menu-item" onclick="showScreen('finance-screen')">
+                    <i class="fa fa-chart-line"></i> Financeiro
+                </div>
+                <div class="menu-item" onclick="showScreen('rh-screen')">
+                    <i class="fa fa-user-tie"></i> Recursos Humanos
+                </div>
+                <div class="menu-item" onclick="showScreen('admin-screen')" id="super-admin-menu" style="display: none;">
+                    <i class="fa fa-cogs"></i> Super Admin
+                </div>
+                <div class="menu-item" onclick="logout()">
+                    <i class="fa fa-sign-out-alt"></i> Sair
+                </div>
+            </div>
+        </div>
+
+        <!-- Conteúdo Principal -->
+        <div class="main-content">
+            <div class="top-bar">
+                <div class="search-box">
+                    <input type="text" class="form-control" placeholder="Pesquisar..." style="width: 300px;">
+                </div>
+                <div class="user-info">
+                    <div class="user-avatar" id="topbar-avatar">JS</div>
+                    <div>
+                        <div style="font-weight: 500;" id="topbar-name">João Silva</div>
+                        <div style="font-size: 0.8rem; color: var(--gray-600);" id="topbar-company">Minha Empresa</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="page-content">
+                <div class="page-header">
+                    <h1 class="page-title">Dashboard</h1>
+                    <div class="page-actions">
+                        <button class="btn btn-outline">
+                            <i class="fa fa-search"></i> Relatório Detalhado
+                        </button>
+                        <button class="btn btn-primary" onclick="openModal('quick-action-modal')">
+                            <i class="fa fa-plus"></i> Ação Rápida
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Estatísticas -->
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-value">125.430,00 MZN</div>
+                        <div class="stat-label">Vendas do Mês</div>
+                        <div class="trend-up">
+                            <i class="fa fa-arrow-up"></i> 12% vs mês anterior
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value">78.250,00 MZN</div>
+                        <div class="stat-label">Despesas do Mês</div>
+                        <div class="trend-down">
+                            <i class="fa fa-arrow-down"></i> 5% vs mês anterior
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value">47.180,00 MZN</div>
+                        <div class="stat-label">Lucro Líquido</div>
+                        <div class="trend-up">
+                            <i class="fa fa-arrow-up"></i> 18% vs mês anterior
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value">92</div>
+                        <div class="stat-label">Clientes Ativos</div>
+                        <div class="trend-up">
+                            <i class="fa fa-arrow-up"></i> 8 novos este mês
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Módulos do Sistema -->
+                <h2 style="margin-bottom: 20px;">Módulos do Sistema</h2>
+                <div class="stats-grid">
+                    <div class="stat-card" onclick="showScreen('inventory-screen')" style="cursor: pointer;">
+                        <div class="stat-value">
+                            <i class="fa fa-box" style="font-size: 2.5rem;"></i>
+                        </div>
+                        <div class="stat-label">Gestão de Inventário</div>
+                        <div style="margin-top: 10px; font-size: 0.9rem; color: var(--gray-600);">
+                            Compras, stock e transferências
+                        </div>
+                    </div>
+                    <div class="stat-card" onclick="showScreen('finance-screen')" style="cursor: pointer;">
+                        <div class="stat-value">
+                            <i class="fa fa-chart-line" style="font-size: 2.5rem;"></i>
+                        </div>
+                        <div class="stat-label">Tesouraria</div>
+                        <div style="margin-top: 10px; font-size: 0.9rem; color: var(--gray-600);">
+                            Bancos, caixas e reconciliação
+                        </div>
+                    </div>
+                    <div class="stat-card" onclick="showScreen('mrp-screen')" style="cursor: pointer;">
+                        <div class="stat-value">
+                            <i class="fa fa-industry" style="font-size: 2.5rem;"></i>
+                        </div>
+                        <div class="stat-label">Produção (MRP)</div>
+                        <div style="margin-top: 10px; font-size: 0.9rem; color: var(--gray-600);">
+                            Planeamento e ordens de fabrico
+                        </div>
+                    </div>
+                    <div class="stat-card" onclick="showScreen('crm-screen')" style="cursor: pointer;">
+                        <div class="stat-value">
+                            <i class="fa fa-users" style="font-size: 2.5rem;"></i>
+                        </div>
+                        <div class="stat-label">CRM</div>
+                        <div style="margin-top: 10px; font-size: 0.9rem; color: var(--gray-600);">
+                            Leads, oportunidades e pipeline
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Atividades Recentes -->
+                <div class="data-table" style="margin-top: 30px;">
+                    <div class="table-header">
+                        <div class="table-title">Atividades Recentes</div>
+                    </div>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Data</th>
+                                <th>Tipo</th>
+                                <th>Descrição</th>
+                                <th>Valor</th>
+                                <th>Estado</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>18/10/2023</td>
+                                <td>Venda</td>
+                                <td>Fatura FT-2023-00125 - Empresa ABC</td>
+                                <td>25.840,00 MZN</td>
+                                <td><span class="badge badge-success">Concluída</span></td>
+                            </tr>
+                            <tr>
+                                <td>17/10/2023</td>
+                                <td>Compra</td>
+                                <td>Pedido de compra #PC-0042</td>
+                                <td>15.200,00 MZN</td>
+                                <td><span class="badge badge-warning">Pendente</span></td>
+                            </tr>
+                            <tr>
+                                <td>16/10/2023</td>
+                                <td>Produção</td>
+                                <td>Ordem de produção #OP-0038 concluída</td>
+                                <td>-</td>
+                                <td><span class="badge badge-success">Concluída</span></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Módulo de Vendas -->
+    <div id="sales-screen" class="app-container hidden">
+        <div class="sidebar">
+            <div class="sidebar-header">
+                <h2>Great ERP</h2>
+                <div style="font-size: 0.8rem; opacity: 0.8;">Vendas</div>
+            </div>
+            <div class="sidebar-menu">
+                <div class="menu-item" onclick="showScreen('dashboard-screen')">
+                    <i class="fa fa-home"></i> Dashboard
+                </div>
+                <div class="menu-item active" onclick="showScreen('sales-screen')">
+                    <i class="fa fa-shopping-cart"></i> Vendas
+                </div>
+                <div class="menu-item" onclick="showScreen('inventory-screen')">
+                    <i class="fa fa-box"></i> Inventário
+                </div>
+                <div class="menu-item" onclick="showScreen('finance-screen')">
+                    <i class="fa fa-chart-line"></i> Financeiro
+                </div>
+                <div class="menu-item" onclick="logout()">
+                    <i class="fa fa-sign-out-alt"></i> Sair
+                </div>
+            </div>
+        </div>
+
+        <div class="main-content">
+            <div class="top-bar">
+                <div class="search-box">
+                    <input type="text" class="form-control" placeholder="Pesquisar faturas..." style="width: 300px;">
+                </div>
+                <div class="user-info">
+                    <div class="user-avatar" id="topbar-avatar-sales">JS</div>
+                    <div>
+                        <div style="font-weight: 500;" id="topbar-name-sales">João Silva</div>
+                        <div style="font-size: 0.8rem; color: var(--gray-600);">Vendas</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="page-content">
+                <div class="page-header">
+                    <h1 class="page-title">Gestão de Vendas</h1>
+                    <div class="page-actions">
+                        <button class="btn btn-outline">
+                            <i class="fa fa-search"></i> Relatório
+                        </button>
+                        <button class="btn btn-primary" onclick="openNewInvoiceModal()">
+                            <i class="fa fa-plus"></i> Nova Fatura
+                        </button>
+                    </div>
+                </div>
+
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-value">42</div>
+                        <div class="stat-label">Vendas Este Mês</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value">125.430,00 MZN</div>
+                        <div class="stat-label">Total de Vendas</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value">18</div>
+                        <div class="stat-label">Clientes Novos</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value">94%</div>
+                        <div class="stat-label">Taxa de Conversão</div>
+                    </div>
+                </div>
+
+                <div class="data-table">
+                    <div class="table-header">
+                        <div class="table-title">Faturas</div>
+                        <button class="btn btn-outline">
+                            <i class="fa fa-edit"></i> Exportar
+                        </button>
+                    </div>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Nº Fatura</th>
+                                <th>Cliente</th>
+                                <th>Data</th>
+                                <th>Valor</th>
+                                <th>Estado</th>
+                                <th>Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>FT-2023-00125</td>
+                                <td>Empresa ABC Lda</td>
+                                <td>15/10/2023</td>
+                                <td>25.840,00 MZN</td>
+                                <td><span class="badge badge-success">Paga</span></td>
+                                <td>
+                                    <button class="btn btn-outline" style="padding: 5px 10px;">
+                                        <i class="fa fa-eye"></i>
+                                    </button>
+                                    <button class="btn btn-outline" style="padding: 5px 10px;">
+                                        <i class="fa fa-edit"></i>
+                                    </button>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>FT-2023-00124</td>
+                                <td>Comércio XYZ</td>
+                                <td>14/10/2023</td>
+                                <td>18.750,00 MZN</td>
+                                <td><span class="badge badge-warning">Pendente</span></td>
+                                <td>
+                                    <button class="btn btn-outline" style="padding: 5px 10px;">
+                                        <i class="fa fa-eye"></i>
+                                    </button>
+                                    <button class="btn btn-outline" style="padding: 5px 10px;">
+                                        <i class="fa fa-edit"></i>
+                                    </button>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>FT-2023-00123</td>
+                                <td>Serviços Globais</td>
+                                <td>12/10/2023</td>
+                                <td>32.150,00 MZN</td>
+                                <td><span class="badge badge-success">Paga</span></td>
+                                <td>
+                                    <button class="btn btn-outline" style="padding: 5px 10px;">
+                                        <i class="fa fa-eye"></i>
+                                    </button>
+                                    <button class="btn btn-outline" style="padding: 5px 10px;">
+                                        <i class="fa fa-edit"></i>
+                                    </button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Módulo de Inventário -->
+    <div id="inventory-screen" class="app-container hidden">
+        <div class="sidebar">
+            <div class="sidebar-header">
+                <h2>Great ERP</h2>
+                <div style="font-size: 0.8rem; opacity: 0.8;">Inventário</div>
+            </div>
+            <div class="sidebar-menu">
+                <div class="menu-item" onclick="showScreen('dashboard-screen')">
+                    <i class="fa fa-home"></i> Dashboard
+                </div>
+                <div class="menu-item" onclick="showScreen('sales-screen')">
+                    <i class="fa fa-shopping-cart"></i> Vendas
+                </div>
+                <div class="menu-item active" onclick="showScreen('inventory-screen')">
+                    <i class="fa fa-box"></i> Inventário
+                </div>
+                <div class="menu-item" onclick="showScreen('mrp-screen')">
+                    <i class="fa fa-industry"></i> Produção
+                </div>
+                <div class="menu-item" onclick="logout()">
+                    <i class="fa fa-sign-out-alt"></i> Sair
+                </div>
+            </div>
+        </div>
+
+        <div class="main-content">
+            <div class="top-bar">
+                <div class="search-box">
+                    <input type="text" class="form-control" placeholder="Pesquisar produtos..." style="width: 300px;">
+                </div>
+                <div class="user-info">
+                    <div class="user-avatar" id="topbar-avatar-inventory">JS</div>
+                    <div>
+                        <div style="font-weight: 500;" id="topbar-name-inventory">João Silva</div>
+                        <div style="font-size: 0.8rem; color: var(--gray-600);">Inventário</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="page-content">
+                <div class="page-header">
+                    <h1 class="page-title">Gestão de Inventário</h1>
+                    <div class="page-actions">
+                        <button class="btn btn-outline">
+                            <i class="fa fa-search"></i> Relatório Stock
+                        </button>
+                        <button class="btn btn-primary" onclick="openNewProductModal()">
+                            <i class="fa fa-plus"></i> Novo Produto
+                        </button>
+                    </div>
+                </div>
+
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-value">542</div>
+                        <div class="stat-label">Produtos em Stock</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value">28</div>
+                        <div class="stat-label">Produtos com Stock Baixo</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value">125.780,00 MZN</div>
+                        <div class="stat-label">Valor Total do Inventário</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value">15</div>
+                        <div class="stat-label">Fornecedores Ativos</div>
+                    </div>
+                </div>
+
+                <div class="data-table">
+                    <div class="table-header">
+                        <div class="table-title">Produtos em Stock</div>
+                        <button class="btn btn-outline">
+                            <i class="fa fa-edit"></i> Exportar
+                        </button>
+                    </div>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Código</th>
+                                <th>Produto</th>
+                                <th>Categoria</th>
+                                <th>Stock Atual</th>
+                                <th>Stock Mínimo</th>
+                                <th>Preço Unit.</th>
+                                <th>Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>P-00125</td>
+                                <td>Teclado Mecânico RGB</td>
+                                <td>Informática</td>
+                                <td>45</td>
+                                <td>10</td>
+                                <td>1.250,00 MZN</td>
+                                <td>
+                                    <button class="btn btn-outline" style="padding: 5px 10px;">
+                                        <i class="fa fa-eye"></i>
+                                    </button>
+                                    <button class="btn btn-outline" style="padding: 5px 10px;">
+                                        <i class="fa fa-edit"></i>
+                                    </button>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>P-00124</td>
+                                <td>Monitor 24" Full HD</td>
+                                <td>Informática</td>
+                                <td>12</td>
+                                <td>5</td>
+                                <td>8.500,00 MZN</td>
+                                <td>
+                                    <button class="btn btn-outline" style="padding: 5px 10px;">
+                                        <i class="fa fa-eye"></i>
+                                    </button>
+                                    <button class="btn btn-outline" style="padding: 5px 10px;">
+                                        <i class="fa fa-edit"></i>
+                                    </button>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>P-00123</td>
+                                <td>Mouse Sem Fio</td>
+                                <td>Informática</td>
+                                <td>8</td>
+                                <td>15</td>
+                                <td>450,00 MZN</td>
+                                <td style="color: var(--danger);">Stock Baixo</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal para Nova Fatura -->
+    <div id="new-invoice-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Nova Fatura</h2>
+                <span class="close" onclick="closeModal('new-invoice-modal')">&times;</span>
+            </div>
+            <form id="invoice-form">
+                <div class="form-group">
+                    <label for="invoice-customer">Cliente</label>
+                    <select id="invoice-customer" class="form-control" required>
+                        <option value="">Selecione um cliente</option>
+                        <option value="1">Empresa ABC Lda</option>
+                        <option value="2">Comércio XYZ</option>
+                        <option value="3">Serviços Globais</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="invoice-date">Data</label>
+                    <input type="date" id="invoice-date" class="form-control" required>
+                </div>
+                <div class="form-group">
+                    <label>Itens da Fatura</label>
+                    <div id="invoice-items">
+                        <div class="form-row">
+                            <select class="form-control product-select" required>
+                                <option value="">Selecione produto</option>
+                                <option value="P-00125">Teclado Mecânico RGB - 1.250,00 MZN</option>
+                                <option value="P-00124">Monitor 24" Full HD - 8.500,00 MZN</option>
+                                <option value="P-00123">Mouse Sem Fio - 450,00 MZN</option>
+                            </select>
+                            <input type="number" class="form-control" placeholder="Quantidade" min="1" required>
+                        </div>
+                    </div>
+                    <button type="button" class="btn btn-outline" onclick="addInvoiceItem()" style="margin-top: 10px;">
+                        <i class="fa fa-plus"></i> Adicionar Item
+                    </button>
+                </div>
+                <div class="form-group">
+                    <label for="invoice-total">Total</label>
+                    <input type="text" id="invoice-total" class="form-control" readonly value="0,00 MZN">
+                </div>
+                <div class="form-group">
+                    <button type="submit" class="btn btn-primary"><i class="fa fa-save"></i> Criar Fatura</button>
+                    <button type="button" class="btn btn-outline" onclick="closeModal('new-invoice-modal')">Cancelar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal para Novo Produto -->
+    <div id="new-product-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Novo Produto</h2>
+                <span class="close" onclick="closeModal('new-product-modal')">&times;</span>
+            </div>
+            <form id="product-form">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="product-code">Código</label>
+                        <input type="text" id="product-code" class="form-control" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="product-name">Nome</label>
+                        <input type="text" id="product-name" class="form-control" required>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="product-category">Categoria</label>
+                        <select id="product-category" class="form-control" required>
+                            <option value="">Selecione categoria</option>
+                            <option value="Informática">Informática</option>
+                            <option value="Escritório">Escritório</option>
+                            <option value="Mobiliário">Mobiliário</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="product-price">Preço</label>
+                        <input type="number" id="product-price" class="form-control" step="0.01" required>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="product-stock">Stock Inicial</label>
+                        <input type="number" id="product-stock" class="form-control" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="product-min-stock">Stock Mínimo</label>
+                        <input type="number" id="product-min-stock" class="form-control" required>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <button type="submit" class="btn btn-primary"><i class="fa fa-save"></i> Criar Produto</button>
+                    <button type="button" class="btn btn-outline" onclick="closeModal('new-product-modal')">Cancelar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // ========== SISTEMA DE AUTENTICAÇÃO ==========
+        const USERS = {
+            'admin@greaterp.com': {
+                password: '123456',
+                name: 'Administrador do Sistema',
+                company: 'GreatERP Technologies',
+                role: 'superadmin'
+            },
+            'joao@empresa.com': {
+                password: '123456',
+                name: 'João Silva',
+                company: 'Minha Empresa Lda',
+                role: 'user'
+            }
+        };
+
+        let currentUser = null;
+
+        function login() {
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            
+            if (USERS[email] && USERS[email].password === password) {
+                currentUser = USERS[email];
+                localStorage.setItem('currentUser', JSON.stringify(currentUser));
+                updateUserInterface();
+                showScreen('dashboard-screen');
+            } else {
+                alert('Credenciais inválidas! Use: admin@greaterp.com / 123456');
+            }
+        }
+
+        function logout() {
+            currentUser = null;
+            localStorage.removeItem('currentUser');
+            showScreen('login-screen');
+        }
+
+        function updateUserInterface() {
+            if (currentUser) {
+                document.getElementById('topbar-name').textContent = currentUser.name;
+                document.getElementById('topbar-company').textContent = currentUser.company;
+                document.getElementById('topbar-avatar').textContent = currentUser.name.split(' ').map(n => n[0]).join('');
+                document.getElementById('sidebar-company').textContent = currentUser.company;
+                
+                if (currentUser.role === 'superadmin') {
+                    document.getElementById('super-admin-menu').style.display = 'block';
+                }
+            }
+        }
+
+        // ========== SISTEMA DE NAVEGAÇÃO ==========
+        function showScreen(screenId) {
+            document.querySelectorAll('.app-container, .login-container').forEach(screen => {
+                screen.classList.add('hidden');
+            });
+            document.getElementById(screenId).classList.remove('hidden');
+            
+            if (currentUser) {
+                updateUserInterface();
+            }
+        }
+
+        // ========== SISTEMA DE MODAIS ==========
+        function openModal(modalId) {
+            document.getElementById(modalId).style.display = 'block';
+        }
+
+        function closeModal(modalId) {
+            document.getElementById(modalId).style.display = 'none';
+        }
+
+        function openNewInvoiceModal() {
+            document.getElementById('invoice-form').reset();
+            document.getElementById('invoice-items').innerHTML = `
+                <div class="form-row">
+                    <select class="form-control product-select" required>
+                        <option value="">Selecione produto</option>
+                        <option value="P-00125">Teclado Mecânico RGB - 1.250,00 MZN</option>
+                        <option value="P-00124">Monitor 24" Full HD - 8.500,00 MZN</option>
+                        <option value="P-00123">Mouse Sem Fio - 450,00 MZN</option>
+                    </select>
+                    <input type="number" class="form-control" placeholder="Quantidade" min="1" required onchange="calculateInvoiceTotal()">
+                </div>
+            `;
+            document.getElementById('invoice-total').value = '0,00 MZN';
+            document.getElementById('invoice-date').valueAsDate = new Date();
+            openModal('new-invoice-modal');
+        }
+
+        function openNewProductModal() {
+            document.getElementById('product-form').reset();
+            document.getElementById('product-code').value = 'P-' + (Math.floor(Math.random() * 1000) + 1000);
+            openModal('new-product-modal');
+        }
+
+        function addInvoiceItem() {
+            const itemsContainer = document.getElementById('invoice-items');
+            const newItem = document.createElement('div');
+            newItem.className = 'form-row';
+            newItem.innerHTML = `
+                <select class="form-control product-select" required>
+                    <option value="">Selecione produto</option>
+                    <option value="P-00125">Teclado Mecânico RGB - 1.250,00 MZN</option>
+                    <option value="P-00124">Monitor 24" Full HD - 8.500,00 MZN</option>
+                    <option value="P-00123">Mouse Sem Fio - 450,00 MZN</option>
+                </select>
+                <input type="number" class="form-control" placeholder="Quantidade" min="1" required onchange="calculateInvoiceTotal()">
+                <button type="button" class="btn btn-danger" onclick="this.parentElement.remove(); calculateInvoiceTotal()">
+                    <i class="fa fa-times"></i>
+                </button>
+            `;
+            itemsContainer.appendChild(newItem);
+        }
+
+        function calculateInvoiceTotal() {
+            let total = 0;
+            document.querySelectorAll('#invoice-items .form-row').forEach(row => {
+                const select = row.querySelector('.product-select');
+                const quantity = row.querySelector('input[type="number"]');
+                if (select.value && quantity.value) {
+                    const price = getProductPrice(select.value);
+                    total += price * parseInt(quantity.value);
+                }
+            });
+            document.getElementById('invoice-total').value = total.toLocaleString('pt-PT') + ',00 MZN';
+        }
+
+        function getProductPrice(productCode) {
+            const prices = {
+                'P-00125': 1250,
+                'P-00124': 8500,
+                'P-00123': 450
+            };
+            return prices[productCode] || 0;
+        }
+
+        // ========== INICIALIZAÇÃO ==========
+        document.addEventListener('DOMContentLoaded', function() {
+            const savedUser = localStorage.getItem('currentUser');
+            if (savedUser) {
+                currentUser = JSON.parse(savedUser);
+                updateUserInterface();
+                showScreen('dashboard-screen');
+            } else {
+                showScreen('login-screen');
+            }
+
+            // Fechar modal ao clicar fora
+            window.onclick = function(event) {
+                document.querySelectorAll('.modal').forEach(modal => {
+                    if (event.target === modal) {
+                        modal.style.display = 'none';
+                    }
+                });
+            };
+
+            // Form handlers
+            document.getElementById('invoice-form').addEventListener('submit', function(e) {
+                e.preventDefault();
+                alert('Fatura criada com sucesso!');
+                closeModal('new-invoice-modal');
+            });
+
+            document.getElementById('product-form').addEventListener('submit', function(e) {
+                e.preventDefault();
+                alert('Produto criado com sucesso!');
+                closeModal('new-product-modal');
+            });
+        });
+    </script>
+</body>
+</html>
