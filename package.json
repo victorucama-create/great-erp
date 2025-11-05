@@ -1,0 +1,23 @@
+{
+  "name": "great-erp",
+  "version": "1.0.0",
+  "description": "Great ERP - Sistema de Gestão Empresarial",
+  "main": "server.js",
+  "type": "module",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js",
+    "build": "echo 'Build completo - Frontend incluído'"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "cors": "^2.8.5",
+    "helmet": "^7.0.0"
+  },
+  "keywords": ["erp", "gestão", "empresarial"],
+  "author": "GreatERP Technologies",
+  "license": "MIT",
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}
