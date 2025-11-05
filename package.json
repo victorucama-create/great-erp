@@ -12,7 +12,8 @@
   "dependencies": {
     "express": "^4.18.2",
     "cors": "^2.8.5",
-    "helmet": "^7.0.0"
+    "helmet": "^7.0.0",
+    "dotenv": "^16.3.1"
   },
   "keywords": ["erp", "gestão", "empresarial"],
   "author": "GreatERP Technologies",
