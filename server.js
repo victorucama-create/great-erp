@@ -1,18 +1,23 @@
 import express from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
+import dotenv from 'dotenv';
+
+dotenv.config();
 
 const app = express();
 const PORT = process.env.PORT || 10000;
 
 // Middleware
 app.use(helmet());
-app.use(cors());
+app.use(cors({
+  origin: '*',
+  credentials: true
+}));
 app.use(express.json());
 
-// ================= GREAT ERP - SISTEMA COMPLETO =================
+// ================= DADOS DA APLICAÇÃO =================
 
-// Dados da aplicação
 const users = {
   'admin@greaterp.com': {
     password: '123456',
@@ -78,12 +83,12 @@ app.get('/api/health', (req, res) => {
   });
 });
 
-// Login
+// Login - CORRIGIDO
 app.post('/api/auth/login', (req, res) => {
   try {
     const { email, password } = req.body;
 
-    console.log('🔐 Login attempt:', email);
+    console.log('🔐 Tentativa de login:', email);
 
     if (!email || !password) {
       return res.status(400).json({ error: 'Email e senha são obrigatórios' });
@@ -98,6 +103,8 @@ app.post('/api/auth/login', (req, res) => {
     // Token simples para demonstração
     const token = 'great-erp-token-' + Date.now();
 
+    console.log('✅ Login bem-sucedido:', email);
+
     res.json({
       success: true,
       token,
@@ -110,8 +117,28 @@ app.post('/api/auth/login', (req, res) => {
     });
 
   } catch (error) {
-    console.error('❌ Login error:', error);
+    console.error('❌ Erro no login:', error);
     res.status(500).json({ error: 'Erro interno do servidor' });
+  }
+});
+
+// Verificar token
+app.post('/api/auth/verify', (req, res) => {
+  try {
+    const token = req.headers.authorization?.replace('Bearer ', '');
+    
+    if (!token) {
+      return res.status(401).json({ error: 'Token não fornecido' });
+    }
+
+    // Verificação simples do token
+    if (token.startsWith('great-erp-token-')) {
+      res.json({ valid: true, message: 'Token válido' });
+    } else {
+      res.status(401).json({ error: 'Token inválido' });
+    }
+  } catch (error) {
+    res.status(401).json({ error: 'Token inválido' });
   }
 });
 
@@ -144,7 +171,7 @@ app.post('/api/invoices', (req, res) => {
     });
 
   } catch (error) {
-    console.error('Create invoice error:', error);
+    console.error('Erro ao criar fatura:', error);
     res.status(500).json({ error: 'Erro ao criar fatura' });
   }
 });
@@ -177,9 +204,18 @@ app.post('/api/products', (req, res) => {
     });
 
   } catch (error) {
-    console.error('Create product error:', error);
+    console.error('Erro ao criar produto:', error);
     res.status(500).json({ error: 'Erro ao criar produto' });
   }
+});
+
+// Rota de teste
+app.get('/api/test', (req, res) => {
+  res.json({ 
+    success: true,
+    message: 'API está funcionando!',
+    timestamp: new Date().toISOString()
+  });
 });
 
 // ================= FRONTEND EMBUTIDO =================
@@ -193,6 +229,20 @@ app.get('/', (req, res) => {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Great ERP - Sistema de Gestão Empresarial</title>
     <style>
+        :root {
+            --primary: #007BFF;
+            --primary-dark: #0056b3;
+            --secondary: #6c757d;
+            --success: #28a745;
+            --danger: #dc3545;
+            --warning: #ffc107;
+            --info: #17a2b8;
+            --light: #f8f9fa;
+            --dark: #343a40;
+            --border-radius: 8px;
+            --box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        
         * {
             margin: 0;
             padding: 0;
@@ -201,40 +251,26 @@ app.get('/', (req, res) => {
         }
         
         body {
-            background: linear-gradient(135deg, #007BFF 0%, #0056b3 100%);
-            min-height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 20px;
+            background-color: var(--light);
+            color: var(--dark);
+            line-height: 1.6;
         }
-        
-        .app-container {
-            background: white;
-            border-radius: 15px;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
-            overflow: hidden;
-            width: 100%;
-            max-width: 1200px;
-            min-height: 600px;
-        }
-        
+
         /* Login Screen */
-        .login-screen {
+        .login-container {
             display: flex;
-            min-height: 600px;
+            min-height: 100vh;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
         }
         
         .login-left {
             flex: 1;
-            background: linear-gradient(135deg, #007BFF 0%, #0056b3 100%);
-            color: white;
-            padding: 40px;
             display: flex;
             flex-direction: column;
             justify-content: center;
             align-items: center;
-            text-align: center;
+            padding: 40px;
+            color: white;
         }
         
         .login-logo {
@@ -245,8 +281,9 @@ app.get('/', (req, res) => {
         
         .login-slogan {
             font-size: 1.2rem;
+            text-align: center;
             margin-bottom: 30px;
-            opacity: 0.9;
+            max-width: 500px;
         }
         
         .features {
@@ -258,21 +295,27 @@ app.get('/', (req, res) => {
         
         .login-right {
             flex: 1;
-            padding: 40px;
             display: flex;
-            flex-direction: column;
             justify-content: center;
+            align-items: center;
+            background-color: white;
+        }
+        
+        .login-form {
+            width: 100%;
+            max-width: 400px;
+            padding: 40px;
         }
         
         .login-title {
             font-size: 2rem;
             font-weight: 600;
             margin-bottom: 10px;
-            color: #333;
+            color: var(--dark);
         }
         
         .login-subtitle {
-            color: #666;
+            color: var(--secondary);
             margin-bottom: 30px;
         }
         
@@ -284,59 +327,59 @@ app.get('/', (req, res) => {
             display: block;
             margin-bottom: 8px;
             font-weight: 500;
-            color: #333;
+            color: var(--dark);
         }
         
         input {
             width: 100%;
             padding: 12px 15px;
             border: 1px solid #ddd;
-            border-radius: 8px;
+            border-radius: var(--border-radius);
             font-size: 1rem;
             transition: border 0.3s;
         }
         
         input:focus {
             outline: none;
-            border-color: #007BFF;
+            border-color: var(--primary);
             box-shadow: 0 0 0 3px rgba(0,123,255,0.1);
         }
         
         button {
-            width: 100%;
-            padding: 12px;
-            background: #007BFF;
+            padding: 12px 20px;
+            background: var(--primary);
             color: white;
             border: none;
-            border-radius: 8px;
+            border-radius: var(--border-radius);
             font-size: 1rem;
             font-weight: 500;
             cursor: pointer;
             transition: background 0.3s;
+            width: 100%;
         }
         
         button:hover {
-            background: #0056b3;
+            background: var(--primary-dark);
         }
         
         .demo-credentials {
             margin-top: 30px;
             padding: 15px;
-            background: #f8f9fa;
-            border-radius: 8px;
+            background: var(--light);
+            border-radius: var(--border-radius);
             font-size: 0.9rem;
             line-height: 1.4;
         }
-        
+
         /* Dashboard */
-        .dashboard {
-            display: none;
-            min-height: 600px;
+        .app-container {
+            display: flex;
+            min-height: 100vh;
         }
         
         .sidebar {
             width: 250px;
-            background: linear-gradient(to bottom, #007BFF, #0056b3);
+            background: linear-gradient(to bottom, var(--primary), var(--primary-dark));
             color: white;
         }
         
@@ -362,6 +405,11 @@ app.get('/', (req, res) => {
             border-left-color: white;
         }
         
+        .menu-item.active {
+            background: rgba(255,255,255,0.15);
+            border-left-color: white;
+        }
+        
         .main-content {
             flex: 1;
             display: flex;
@@ -374,7 +422,7 @@ app.get('/', (req, res) => {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            box-shadow: var(--box-shadow);
         }
         
         .user-info {
@@ -387,7 +435,7 @@ app.get('/', (req, res) => {
             width: 40px;
             height: 40px;
             border-radius: 50%;
-            background: #007BFF;
+            background: var(--primary);
             color: white;
             display: flex;
             align-items: center;
@@ -398,7 +446,7 @@ app.get('/', (req, res) => {
         .page-content {
             flex: 1;
             padding: 30px;
-            background: #f8f9fa;
+            background: var(--light);
         }
         
         .page-header {
@@ -411,7 +459,41 @@ app.get('/', (req, res) => {
         .page-title {
             font-size: 1.8rem;
             font-weight: 600;
-            color: #333;
+            color: var(--dark);
+        }
+        
+        .page-actions {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: var(--border-radius);
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.3s;
+        }
+        
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background: var(--primary-dark);
+        }
+        
+        .btn-outline {
+            background: transparent;
+            border: 1px solid var(--primary);
+            color: var(--primary);
+        }
+        
+        .btn-outline:hover {
+            background: var(--primary);
+            color: white;
         }
         
         .stats-grid {
@@ -423,9 +505,14 @@ app.get('/', (req, res) => {
         
         .stat-card {
             background: white;
-            border-radius: 8px;
+            border-radius: var(--border-radius);
             padding: 20px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            box-shadow: var(--box-shadow);
+            transition: transform 0.3s;
+        }
+        
+        .stat-card:hover {
+            transform: translateY(-5px);
         }
         
         .stat-value {
@@ -435,36 +522,148 @@ app.get('/', (req, res) => {
         }
         
         .stat-label {
-            color: #666;
+            color: var(--secondary);
             font-size: 0.9rem;
+        }
+        
+        .data-table {
+            width: 100%;
+            background: white;
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+            overflow: hidden;
+            margin-bottom: 20px;
+        }
+        
+        .table-header {
+            padding: 20px;
+            border-bottom: 1px solid #eee;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .table-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        th, td {
+            padding: 15px;
+            text-align: left;
+            border-bottom: 1px solid #eee;
+        }
+        
+        th {
+            background: var(--light);
+            font-weight: 600;
+        }
+        
+        tr:hover {
+            background: var(--light);
+        }
+        
+        .badge {
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 0.8rem;
+            font-weight: 500;
+        }
+        
+        .badge-success {
+            background: var(--success);
+            color: white;
+        }
+        
+        .badge-warning {
+            background: var(--warning);
+            color: black;
+        }
+        
+        .badge-danger {
+            background: var(--danger);
+            color: white;
         }
         
         .hidden {
             display: none !important;
         }
         
-        .flex {
-            display: flex;
+        .trend-up {
+            color: var(--success);
+        }
+        
+        .trend-down {
+            color: var(--danger);
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .login-container {
+                flex-direction: column;
+            }
+            
+            .login-left {
+                padding: 20px;
+            }
+            
+            .login-right {
+                border-radius: 20px 20px 0 0;
+                margin-top: -20px;
+            }
+            
+            .app-container {
+                flex-direction: column;
+            }
+            
+            .sidebar {
+                width: 100%;
+            }
+            
+            .sidebar-menu {
+                display: flex;
+                overflow-x: auto;
+            }
+            
+            .menu-item {
+                flex-shrink: 0;
+                white-space: nowrap;
+            }
+            
+            .page-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 15px;
+            }
+            
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
         }
     </style>
 </head>
 <body>
-    <!-- Login Screen -->
-    <div class="app-container">
-        <div id="login-screen" class="login-screen">
-            <div class="login-left">
-                <div class="login-logo">Great ERP</div>
-                <div class="login-slogan">
-                    Sistema de Gestão Empresarial Integrado para PMEs
-                </div>
-                <div class="features">
-                    <div>✓ Utilizadores ilimitados</div>
-                    <div>✓ Armazéns ilimitados</div>
-                    <div>✓ Gestão completa</div>
-                    <div>✓ Suporte técnico</div>
-                </div>
+    <!-- Tela de Login -->
+    <div id="login-screen" class="login-container">
+        <div class="login-left">
+            <div class="login-logo">Great ERP</div>
+            <div class="login-slogan">
+                Sistema de Gestão Empresarial Integrado para PMEs
             </div>
-            <div class="login-right">
+            <div class="features">
+                <div>✓ Utilizadores ilimitados</div>
+                <div>✓ Armazéns ilimitados</div>
+                <div>✓ Gestão completa</div>
+                <div>✓ Suporte técnico</div>
+            </div>
+        </div>
+        <div class="login-right">
+            <div class="login-form">
                 <h2 class="login-title">Entrar no Sistema</h2>
                 <p class="login-subtitle">Acesse sua conta do Great ERP</p>
                 
@@ -489,87 +688,136 @@ app.get('/', (req, res) => {
                 </div>
             </div>
         </div>
+    </div>
 
-        <!-- Dashboard -->
-        <div id="dashboard" class="dashboard">
-            <div class="sidebar">
-                <div class="sidebar-header">
-                    <h2>Great ERP</h2>
-                    <div id="company-name">GreatERP Technologies</div>
+    <!-- Dashboard -->
+    <div id="dashboard-screen" class="app-container hidden">
+        <div class="sidebar">
+            <div class="sidebar-header">
+                <h2>Great ERP</h2>
+                <div id="sidebar-company">GreatERP Technologies</div>
+            </div>
+            <div class="sidebar-menu">
+                <div class="menu-item active" onclick="showScreen('dashboard')">📊 Dashboard</div>
+                <div class="menu-item" onclick="showScreen('sales')">🛒 Vendas</div>
+                <div class="menu-item" onclick="showScreen('inventory')">📦 Inventário</div>
+                <div class="menu-item" onclick="showScreen('finance')">💰 Financeiro</div>
+                <div class="menu-item" id="admin-menu" style="display:none" onclick="showScreen('admin')">⚙️ Admin</div>
+                <div class="menu-item" onclick="logout()">🚪 Sair</div>
+            </div>
+        </div>
+
+        <div class="main-content">
+            <div class="top-bar">
+                <div class="search-box">
+                    <input type="text" placeholder="Pesquisar...">
                 </div>
-                <div class="sidebar-menu">
-                    <div class="menu-item active" onclick="showScreen('dashboard')">📊 Dashboard</div>
-                    <div class="menu-item" onclick="showScreen('sales')">🛒 Vendas</div>
-                    <div class="menu-item" onclick="showScreen('inventory')">📦 Inventário</div>
-                    <div class="menu-item" onclick="showScreen('finance')">💰 Financeiro</div>
-                    <div class="menu-item" id="admin-menu" style="display:none" onclick="showScreen('admin')">⚙️ Admin</div>
-                    <div class="menu-item" onclick="logout()">🚪 Sair</div>
+                <div class="user-info">
+                    <div class="user-avatar" id="user-avatar">AD</div>
+                    <div>
+                        <div style="font-weight:500" id="user-name">Administrador</div>
+                        <div style="font-size:0.8rem;color:#666" id="user-role">Super Admin</div>
+                    </div>
                 </div>
             </div>
 
-            <div class="main-content">
-                <div class="top-bar">
-                    <div class="search-box">
-                        <input type="text" placeholder="Pesquisar...">
-                    </div>
-                    <div class="user-info">
-                        <div class="user-avatar" id="user-avatar">AD</div>
-                        <div>
-                            <div style="font-weight:500" id="user-name">Administrador</div>
-                            <div style="font-size:0.8rem;color:#666" id="user-role">Super Admin</div>
+            <div class="page-content">
+                <!-- Dashboard Content -->
+                <div id="dashboard-content">
+                    <div class="page-header">
+                        <h1 class="page-title">Dashboard</h1>
+                        <div class="page-actions">
+                            <button class="btn btn-outline">📊 Relatório</button>
+                            <button class="btn btn-primary">➕ Nova Transação</button>
                         </div>
+                    </div>
+
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <div class="stat-value">125.430,00 MZN</div>
+                            <div class="stat-label">Vendas do Mês</div>
+                            <div class="trend-up">↑ 12% vs mês anterior</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-value">78.250,00 MZN</div>
+                            <div class="stat-label">Despesas do Mês</div>
+                            <div class="trend-down">↓ 5% vs mês anterior</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-value">47.180,00 MZN</div>
+                            <div class="stat-label">Lucro Líquido</div>
+                            <div class="trend-up">↑ 18% vs mês anterior</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-value">92</div>
+                            <div class="stat-label">Clientes Ativos</div>
+                            <div class="trend-up">↑ 8 novos</div>
+                        </div>
+                    </div>
+
+                    <div class="data-table">
+                        <div class="table-header">
+                            <div class="table-title">Atividades Recentes</div>
+                        </div>
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Data</th>
+                                    <th>Tipo</th>
+                                    <th>Descrição</th>
+                                    <th>Valor</th>
+                                    <th>Estado</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>18/10/2023</td>
+                                    <td>Venda</td>
+                                    <td>Fatura FT-2023-00125 - Empresa ABC</td>
+                                    <td>25.840,00 MZN</td>
+                                    <td><span class="badge badge-success">Concluída</span></td>
+                                </tr>
+                                <tr>
+                                    <td>17/10/2023</td>
+                                    <td>Compra</td>
+                                    <td>Pedido de compra #PC-0042</td>
+                                    <td>15.200,00 MZN</td>
+                                    <td><span class="badge badge-warning">Pendente</span></td>
+                                </tr>
+                            </tbody>
+                        </table>
                     </div>
                 </div>
 
-                <div class="page-content">
-                    <!-- Dashboard Content -->
-                    <div id="dashboard-content">
-                        <div class="page-header">
-                            <h1 class="page-title">Dashboard</h1>
-                            <div class="page-actions">
-                                <button>📊 Relatório</button>
-                                <button>➕ Nova Transação</button>
-                            </div>
-                        </div>
-
-                        <div class="stats-grid">
-                            <div class="stat-card">
-                                <div class="stat-value">125.430,00 MZN</div>
-                                <div class="stat-label">Vendas do Mês</div>
-                            </div>
-                            <div class="stat-card">
-                                <div class="stat-value">78.250,00 MZN</div>
-                                <div class="stat-label">Despesas do Mês</div>
-                            </div>
-                            <div class="stat-card">
-                                <div class="stat-value">47.180,00 MZN</div>
-                                <div class="stat-label">Lucro Líquido</div>
-                            </div>
-                            <div class="stat-card">
-                                <div class="stat-value">92</div>
-                                <div class="stat-label">Clientes Ativos</div>
-                            </div>
+                <!-- Sales Content -->
+                <div id="sales-content" class="hidden">
+                    <div class="page-header">
+                        <h1 class="page-title">Módulo de Vendas</h1>
+                        <div class="page-actions">
+                            <button class="btn btn-outline">📊 Relatório</button>
+                            <button class="btn btn-primary">➕ Nova Venda</button>
                         </div>
                     </div>
+                    <p>Módulo de vendas em funcionamento...</p>
+                </div>
 
-                    <!-- Other screens would go here -->
-                    <div id="sales-content" class="hidden">
-                        <div class="page-header">
-                            <h1 class="page-title">Módulo de Vendas</h1>
-                            <div class="page-actions">
-                                <button>📊 Relatório</button>
-                                <button>➕ Nova Venda</button>
-                            </div>
+                <!-- Inventory Content -->
+                <div id="inventory-content" class="hidden">
+                    <div class="page-header">
+                        <h1 class="page-title">Gestão de Inventário</h1>
+                        <div class="page-actions">
+                            <button class="btn btn-outline">📊 Relatório Stock</button>
+                            <button class="btn btn-primary">➕ Novo Produto</button>
                         </div>
-                        <p>Módulo de vendas em funcionamento...</p>
                     </div>
+                    <p>Módulo de inventário em funcionamento...</p>
                 </div>
             </div>
         </div>
     </div>
 
     <script>
-        // Sistema de Autenticação
+        // ========== SISTEMA DE AUTENTICAÇÃO ==========
         const API_BASE = '/api';
         
         document.getElementById('login-form').addEventListener('submit', async (e) => {
@@ -577,8 +825,14 @@ app.get('/', (req, res) => {
             
             const email = document.getElementById('email').value;
             const password = document.getElementById('password').value;
+            const button = e.target.querySelector('button');
+            
+            button.textContent = 'Entrando...';
+            button.disabled = true;
             
             try {
+                console.log('📤 Enviando requisição de login...');
+                
                 const response = await fetch(API_BASE + '/auth/login', {
                     method: 'POST',
                     headers: {
@@ -587,29 +841,37 @@ app.get('/', (req, res) => {
                     body: JSON.stringify({ email, password })
                 });
                 
+                console.log('📥 Resposta recebida:', response.status);
+                
                 const data = await response.json();
+                console.log('📊 Dados da resposta:', data);
                 
                 if (data.success) {
                     // Login successful
                     localStorage.setItem('currentUser', JSON.stringify(data.user));
                     localStorage.setItem('token', data.token);
                     showDashboard(data.user);
+                    alert('✅ Login realizado com sucesso!');
                 } else {
-                    alert(data.error || 'Erro ao fazer login');
+                    alert('❌ ' + (data.error || 'Erro ao fazer login'));
                 }
             } catch (error) {
-                alert('Erro de conexão: ' + error.message);
+                console.error('💥 Erro de conexão:', error);
+                alert('❌ Erro de conexão: ' + error.message);
+            } finally {
+                button.textContent = 'Entrar no Sistema';
+                button.disabled = false;
             }
         });
 
         function showDashboard(user) {
             document.getElementById('login-screen').style.display = 'none';
-            document.getElementById('dashboard').classList.add('flex');
+            document.getElementById('dashboard-screen').classList.remove('hidden');
             
             // Update user info
             document.getElementById('user-name').textContent = user.name;
             document.getElementById('user-role').textContent = user.role;
-            document.getElementById('company-name').textContent = user.company;
+            document.getElementById('sidebar-company').textContent = user.company;
             document.getElementById('user-avatar').textContent = 
                 user.name.split(' ').map(n => n[0]).join('');
             
@@ -637,14 +899,29 @@ app.get('/', (req, res) => {
         function logout() {
             localStorage.removeItem('currentUser');
             localStorage.removeItem('token');
-            document.getElementById('dashboard').classList.remove('flex');
+            document.getElementById('dashboard-screen').classList.add('hidden');
             document.getElementById('login-screen').style.display = 'flex';
         }
 
         // Check if user is already logged in
-        const savedUser = localStorage.getItem('currentUser');
-        if (savedUser) {
-            showDashboard(JSON.parse(savedUser));
+        document.addEventListener('DOMContentLoaded', function() {
+            const savedUser = localStorage.getItem('currentUser');
+            if (savedUser) {
+                showDashboard(JSON.parse(savedUser));
+            }
+            
+            // Test API connection
+            testAPI();
+        });
+
+        async function testAPI() {
+            try {
+                const response = await fetch(API_BASE + '/health');
+                const data = await response.json();
+                console.log('✅ API Health:', data);
+            } catch (error) {
+                console.error('❌ API Health check failed:', error);
+            }
         }
     </script>
 </body>
@@ -665,9 +942,15 @@ app.listen(PORT, '0.0.0.0', () => {
   console.log('   GET  /              - Frontend completo');
   console.log('   GET  /api/health    - Health check');
   console.log('   POST /api/auth/login - Login');
+  console.log('   POST /api/auth/verify - Verificar token');
   console.log('   GET  /api/invoices  - Listar faturas');
   console.log('   POST /api/invoices  - Criar fatura');
   console.log('   GET  /api/products  - Listar produtos');
   console.log('   POST /api/products  - Criar produto');
+  console.log('   GET  /api/test      - Teste da API');
+  console.log('='.repeat(50));
+  console.log('🔐 CREDENCIAIS:');
+  console.log('   admin@greaterp.com / 123456');
+  console.log('   joao@empresa.com / 123456');
   console.log('='.repeat(50));
 });
