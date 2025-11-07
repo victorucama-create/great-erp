@@ -1192,13 +1192,17 @@
             const email = document.getElementById('email').value;
             const password = document.getElementById('password').value;
             
+            // Verifica se o usuário existe e a senha está correta
             if (USERS[email] && USERS[email].password === password) {
-                currentUser = USERS[email];
+                currentUser = {
+                    email: email,
+                    ...USERS[email]
+                };
                 localStorage.setItem('currentUser', JSON.stringify(currentUser));
                 updateUserInterface();
                 showScreen('dashboard-screen');
             } else {
-                alert('Credenciais inválidas! Use: admin@greaterp.com / 123456');
+                alert('Credenciais inválidas! Use: admin@greaterp.com / 123456 ou joao@empresa.com / 123456');
             }
         }
 
@@ -1210,13 +1214,22 @@
 
         function updateUserInterface() {
             if (currentUser) {
+                // Atualiza dashboard
                 document.getElementById('topbar-name').textContent = currentUser.name;
                 document.getElementById('topbar-company').textContent = currentUser.company;
                 document.getElementById('topbar-avatar').textContent = currentUser.name.split(' ').map(n => n[0]).join('');
                 document.getElementById('sidebar-company').textContent = currentUser.company;
                 
+                // Atualiza outras telas
+                document.getElementById('topbar-name-sales').textContent = currentUser.name;
+                document.getElementById('topbar-avatar-sales').textContent = currentUser.name.split(' ').map(n => n[0]).join('');
+                document.getElementById('topbar-name-inventory').textContent = currentUser.name;
+                document.getElementById('topbar-avatar-inventory').textContent = currentUser.name.split(' ').map(n => n[0]).join('');
+                
                 if (currentUser.role === 'superadmin') {
                     document.getElementById('super-admin-menu').style.display = 'block';
+                } else {
+                    document.getElementById('super-admin-menu').style.display = 'none';
                 }
             }
         }
