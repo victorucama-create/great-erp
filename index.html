@@ -485,6 +485,20 @@
         .fa-save:before { content: "💾"; }
         .fa-times:before { content: "✕"; }
 
+        /* Alertas */
+        .alert {
+            padding: 12px 16px;
+            border-radius: var(--border-radius);
+            margin-bottom: 20px;
+            display: none;
+        }
+
+        .alert-danger {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
         /* Responsive */
         @media (max-width: 768px) {
             .app-container {
@@ -572,6 +586,10 @@
             <div class="login-form">
                 <h2 class="login-title">Entrar no Sistema</h2>
                 <p class="login-subtitle">Acesse sua conta ou registre uma nova empresa</p>
+                
+                <div id="login-alert" class="alert alert-danger">
+                    Credenciais inválidas! Use: admin@greaterp.com / 123456 ou joao@empresa.com / 123456
+                </div>
                 
                 <div class="form-group">
                     <label for="email">E-mail</label>
@@ -1191,6 +1209,7 @@
         function login() {
             const email = document.getElementById('email').value;
             const password = document.getElementById('password').value;
+            const alert = document.getElementById('login-alert');
             
             // Verifica se o usuário existe e a senha está correta
             if (USERS[email] && USERS[email].password === password) {
@@ -1201,8 +1220,9 @@
                 localStorage.setItem('currentUser', JSON.stringify(currentUser));
                 updateUserInterface();
                 showScreen('dashboard-screen');
+                alert.style.display = 'none';
             } else {
-                alert('Credenciais inválidas! Use: admin@greaterp.com / 123456 ou joao@empresa.com / 123456');
+                alert.style.display = 'block';
             }
         }
 
