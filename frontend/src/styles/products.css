@@ -1,0 +1,7 @@
+/* products.css */
+.products-root { display:flex; flex-direction:column; gap:12px; }
+.module-header { display:flex; justify-content:space-between; align-items:center; }
+.actions { display:flex; gap:8px; }
+.modal { position:fixed; left:0; right:0; top:0; bottom:0; display:flex; align-items:center; justify-content:center; z-index:60; }
+.modal .card { width:720px; max-width:94%; }
+.hidden{display:none}
