@@ -1,0 +1,36 @@
+<!-- products.html -->
+<div class="products-root">
+  <div class="module-header">
+    <h2>Produtos</h2>
+    <div class="actions">
+      <button id="btnAddProduct" class="btn"><i class="fa fa-plus"></i> Novo Produto</button>
+      <button id="btnExportProducts" class="btn ghost"><i class="fa fa-download"></i> Exportar CSV</button>
+    </div>
+  </div>
+
+  <div class="card">
+    <div style="margin-bottom:12px;display:flex;gap:8px;align-items:center">
+      <input id="productSearch" placeholder="Pesquisar por SKU ou nome..." style="flex:1;padding:8px;border-radius:8px;border:1px solid #e6eef8" />
+      <select id="filterWarehouse" style="padding:8px;border-radius:8px;border:1px solid #e6eef8">
+        <option value="">Todos armazéns</option>
+      </select>
+    </div>
+
+    <table id="productsTable" style="width:100%;border-collapse:collapse">
+      <thead style="background:#fbfdff">
+        <tr>
+          <th style="padding:10px">SKU</th>
+          <th style="padding:10px">Nome</th>
+          <th style="padding:10px">Categoria</th>
+          <th style="padding:10px">Preço</th>
+          <th style="padding:10px">Stock</th>
+          <th style="padding:10px">Ações</th>
+        </tr>
+      </thead>
+      <tbody id="productsTbody"></tbody>
+    </table>
+  </div>
+
+  <!-- modal container -->
+  <div id="productModal" class="modal hidden"></div>
+</div>
