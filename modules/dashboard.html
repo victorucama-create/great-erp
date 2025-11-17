@@ -1,0 +1,57 @@
+<!-- dashboard.html - módulo carregável -->
+<div class="dashboard-root">
+  <div class="dashboard-header">
+    <h1>Dashboard</h1>
+    <div class="dashboard-actions">
+      <button class="btn" id="btnNewSale"><i class="fa fa-plus"></i> Nova Venda</button>
+      <button class="btn ghost" id="btnExportPdf"><i class="fa fa-file-pdf"></i> Exportar PDF</button>
+    </div>
+  </div>
+
+  <div class="dashboard-grid">
+    <!-- KPIs -->
+    <div class="kpis">
+      <div class="kpi-card">
+        <div class="kpi-title">Vendas Mês</div>
+        <div class="kpi-value" id="dashSalesMonth">-</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-title">Cash / Caixa</div>
+        <div class="kpi-value" id="dashCash">-</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-title">Investimentos (Mola)</div>
+        <div class="kpi-value" id="dashMola">-</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-title">Pedidos B2B</div>
+        <div class="kpi-value" id="dashB2B">-</div>
+      </div>
+    </div>
+
+    <!-- Charts -->
+    <div class="charts">
+      <div class="card">
+        <h3>Vendas últimos 7 dias</h3>
+        <canvas id="chartSales7" height="120"></canvas>
+      </div>
+      <div class="card">
+        <h3>Leads / CRM (últimos 30 dias)</h3>
+        <canvas id="chartLeads30" height="120"></canvas>
+      </div>
+    </div>
+
+    <!-- Recent activity & alerts -->
+    <div class="side-cards">
+      <div class="card">
+        <h4>Atividade Recente</h4>
+        <ul id="dashRecent" class="list-compact"></ul>
+      </div>
+
+      <div class="card">
+        <h4>Alertas</h4>
+        <ul id="dashAlerts" class="list-compact"></ul>
+      </div>
+    </div>
+  </div>
+</div>
