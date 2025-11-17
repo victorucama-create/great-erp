@@ -1,3 +1,110 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Great Nexus – Ecossistema Empresarial Inteligente</title>
+
+    <link rel="stylesheet" href="styles/main.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+</head>
+<body>
+
+    <!-- AUTH SCREENS -->
+    <div id="auth-container" class="auth-container">
+        <div class="auth-card">
+            <div class="auth-header">
+                <img src="assets/logo.svg" class="auth-logo">
+                <h1>Great Nexus</h1>
+                <p>Central empresarial integrada (ERP • CRM • MRP • HR • B2B)</p>
+            </div>
+
+            <form id="login-form" class="auth-form">
+                <label>Email</label>
+                <input id="login-email" type="email" required>
+
+                <label>Password</label>
+                <input id="login-password" type="password" required>
+
+                <button type="submit" class="btn-primary">Entrar</button>
+
+                <button type="button" id="demo-login" class="btn-outline">
+                    Login Demo
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- APP -->
+    <div id="app" class="hidden">
+
+        <!-- SIDEBAR -->
+        <aside class="sidebar">
+
+            <div class="sidebar-logo">
+                <img src="assets/logo.svg">
+                <span>Great Nexus</span>
+            </div>
+
+            <div class="sidebar-user">
+                <div id="user-name">User</div>
+                <div id="user-role">Role</div>
+                <div id="tenant-name">Empresa</div>
+            </div>
+
+            <ul class="sidebar-menu">
+
+                <li class="menu-title">Geral</li>
+                <li data-module="dashboard"><i class="fa fa-home"></i> Dashboard</li>
+
+                <li class="menu-title">ERP</li>
+                <li data-module="erp"><i class="fa fa-box"></i> ERP / Inventário</li>
+
+                <li class="menu-title">CRM</li>
+                <li data-module="crm"><i class="fa fa-users"></i> CRM & Vendas</li>
+
+                <li class="menu-title">MRP</li>
+                <li data-module="mrp"><i class="fa fa-industry"></i> Produção / MRP</li>
+
+                <li class="menu-title">RH</li>
+                <li data-module="hr"><i class="fa fa-user-tie"></i> Recursos Humanos</li>
+
+                <li class="menu-title">B2B</li>
+                <li data-module="b2b"><i class="fa fa-handshake"></i> Marketplace B2B</li>
+
+                <li class="menu-title">Logística</li>
+                <li data-module="logistics"><i class="fa fa-truck"></i> Logística & Fretes</li>
+
+                <li class="menu-title">Fintech</li>
+                <li data-module="mola"><i class="fa fa-wallet"></i> Great Mola</li>
+
+                <li class="menu-title">Configurações</li>
+                <li data-module="settings"><i class="fa fa-gear"></i> Definições</li>
+
+                <li id="logout"><i class="fa fa-sign-out-alt"></i> Sair</li>
+            </ul>
+        </aside>
+
+        <!-- MAIN -->
+        <main class="main">
+
+            <!-- TOPBAR -->
+            <header class="topbar">
+                <div class="topbar-title" id="module-title">Dashboard</div>
+
+                <div class="topbar-actions">
+                    <button class="topbar-btn">
+                        <i class="fa fa-bell"></i>
+                    </button>
+                    <button class="topbar-btn">
+                        <i class="fa fa-question-circle"></i>
+                    </button>
+                </div>
+            </header>
+
+            <!-- MAIN CONTENT -->
+            <section id="content-area" class="content-area">
 <!-- dashboard.html - módulo carregável -->
 <div class="dashboard-root">
   <div class="dashboard-header">
