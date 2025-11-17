@@ -103,7 +103,325 @@
                 </div>
             </header>
 
-            <!-- MAIN CONTENT -->
+                <!-- ======================
+         MODULE: DASHBOARD
+       ====================== -->
+    <div id="module-dashboard" class="module">
+        <div class="module-header">
+            <h2>Dashboard</h2>
+            <p class="muted">Visão geral — métricas, vendas, inventário e atividades recentes.</p>
+        </div>
+
+        <div class="dashboard-grid">
+            <div class="card stat-card">
+                <div class="stat-label">Vendas Hoje</div>
+                <div class="stat-value" id="stat-sales-today">0 MZN</div>
+                <div class="stat-note">Comparado ao dia anterior</div>
+            </div>
+
+            <div class="card stat-card">
+                <div class="stat-label">Produtos em Stock</div>
+                <div class="stat-value" id="stat-products">0</div>
+                <div class="stat-note">Total across warehouses</div>
+            </div>
+
+            <div class="card stat-card">
+                <div class="stat-label">Investimentos (Great Mola)</div>
+                <div class="stat-value" id="stat-mola">0 MZN</div>
+                <div class="stat-note">Retorno acumulado</div>
+            </div>
+
+            <div class="card stat-card">
+                <div class="stat-label">Pedidos Pendentes</div>
+                <div class="stat-value" id="stat-pending-orders">0</div>
+                <div class="stat-note">Aguardando processamento</div>
+            </div>
+        </div>
+
+        <div class="card">
+            <h3>Atividade Recente</h3>
+            <ul id="recent-activity" class="activity-list">
+                <li>Nenhuma atividade registada</li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- ======================
+         MODULE: ERP (Produtos & Inventário)
+       ====================== -->
+    <div id="module-erp" class="module hidden">
+        <div class="module-header">
+            <h2>ERP / Inventário</h2>
+            <p class="muted">Gestão de produtos, armazéns, movimentações e stock.</p>
+            <div class="module-actions">
+                <button class="btn" id="erp-new-product">Novo Produto</button>
+                <button class="btn ghost" id="erp-import">Importar CSV</button>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="toolbar">
+                <input id="erp-search" placeholder="Pesquisar SKU, nome ou categoria..." />
+                <select id="erp-warehouse-filter"><option value="">Todos armazéns</option></select>
+                <button class="btn ghost" id="erp-refresh">Atualizar</button>
+            </div>
+
+            <table class="table">
+                <thead>
+                    <tr><th>SKU</th><th>Nome</th><th>Categoria</th><th>Preço</th><th>Stock Total</th><th>Ações</th></tr>
+                </thead>
+                <tbody id="erp-products-tbody">
+                    <tr><td colspan="6" class="muted">Sem produtos — carregar dados.</td></tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="card">
+            <h3>Armazéns</h3>
+            <div id="erp-warehouses" class="grid-sm">
+                <div class="warehouse-card card muted">Nenhum armazém</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ======================
+         MODULE: CRM & VENDAS
+       ====================== -->
+    <div id="module-crm" class="module hidden">
+        <div class="module-header">
+            <h2>CRM & Vendas</h2>
+            <p class="muted">Leads, contactos, oportunidades e faturas (integração com vendas).</p>
+            <div class="module-actions">
+                <button class="btn" id="crm-new-lead">Novo Lead</button>
+                <button class="btn ghost" id="crm-import">Importar contactos</button>
+            </div>
+        </div>
+
+        <div class="card grid-2">
+            <div>
+                <h3>Leads Recentes</h3>
+                <table class="table small">
+                    <thead><tr><th>Nome</th><th>Fonte</th><th>Status</th></tr></thead>
+                    <tbody id="crm-leads-tbody"><tr><td colspan="3" class="muted">Sem leads registados</td></tr></tbody>
+                </table>
+            </div>
+
+            <div>
+                <h3>Oportunidades</h3>
+                <table class="table small">
+                    <thead><tr><th>Título</th><th>Valor</th><th>Fase</th></tr></thead>
+                    <tbody id="crm-opps-tbody"><tr><td colspan="3" class="muted">Sem oportunidades</td></tr></tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="card">
+            <h3>Clientes</h3>
+            <table class="table">
+                <thead><tr><th>Empresa</th><th>Contato</th><th>Telefone</th><th>Faturas</th></tr></thead>
+                <tbody id="crm-contacts-tbody"><tr><td colspan="4" class="muted">Sem clientes</td></tr></tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- ======================
+         MODULE: MRP (Produção)
+       ====================== -->
+    <div id="module-mrp" class="module hidden">
+        <div class="module-header">
+            <h2>MRP — Planeamento de Produção</h2>
+            <p class="muted">Gestão de BOM, ordens de produção e planejamento de materiais.</p>
+            <div class="module-actions">
+                <button class="btn" id="mrp-new-bom">Novo BOM</button>
+                <button class="btn ghost" id="mrp-new-order">Criar Ordem</button>
+            </div>
+        </div>
+
+        <div class="card">
+            <h3>Bill of Materials (BOM)</h3>
+            <table class="table">
+                <thead><tr><th>Produto</th><th>Componentes</th><th>Qtd</th></tr></thead>
+                <tbody id="mrp-bom-tbody"><tr><td colspan="3" class="muted">Sem BOMs</td></tr></tbody>
+            </table>
+        </div>
+
+        <div class="card">
+            <h3>Ordens de Produção</h3>
+            <table class="table">
+                <thead><tr><th>Nº Ordem</th><th>Produto</th><th>Qtd</th><th>Estado</th></tr></thead>
+                <tbody id="mrp-orders-tbody"><tr><td colspan="4" class="muted">Sem ordens</td></tr></tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- ======================
+         MODULE: HR (Recursos Humanos)
+       ====================== -->
+    <div id="module-hr" class="module hidden">
+        <div class="module-header">
+            <h2>Recursos Humanos</h2>
+            <p class="muted">Gestão de colaboradores, presenças e folha de pagamento.</p>
+            <div class="module-actions">
+                <button class="btn" id="hr-new-employee">Novo Colaborador</button>
+            </div>
+        </div>
+
+        <div class="card">
+            <h3>Colaboradores</h3>
+            <table class="table">
+                <thead><tr><th>Nome</th><th>Email</th><th>Função</th><th>Estado</th></tr></thead>
+                <tbody id="hr-employees-tbody"><tr><td colspan="4" class="muted">Nenhum colaborador</td></tr></tbody>
+            </table>
+        </div>
+
+        <div class="card">
+            <h3>Registo de Presenças</h3>
+            <div id="hr-attendance" class="muted">Sem registos</div>
+        </div>
+    </div>
+
+    <!-- ======================
+         MODULE: B2B Marketplace
+       ====================== -->
+    <div id="module-b2b" class="module hidden">
+        <div class="module-header">
+            <h2>Marketplace B2B</h2>
+            <p class="muted">Lista de listings, contratos e comissões entre empresas.</p>
+            <div class="module-actions">
+                <button class="btn" id="b2b-new-listing">Novo Listing</button>
+            </div>
+        </div>
+
+        <div class="card">
+            <h3>Listings</h3>
+            <table class="table">
+                <thead><tr><th>Produto</th><th>Vendedor</th><th>Preço</th><th>Qtd</th></tr></thead>
+                <tbody id="b2b-listings-tbody"><tr><td colspan="4" class="muted">Nenhum listing activo</td></tr></tbody>
+            </table>
+        </div>
+
+        <div class="card">
+            <h3>Contratos</h3>
+            <div id="b2b-contracts" class="muted">Sem contratos</div>
+        </div>
+    </div>
+
+    <!-- ======================
+         MODULE: LOGÍSTICA
+       ====================== -->
+    <div id="module-logistics" class="module hidden">
+        <div class="module-header">
+            <h2>Logística & Fretes</h2>
+            <p class="muted">Envios, rastreio e integração com carriers.</p>
+            <div class="module-actions">
+                <button class="btn" id="logistics-new-shipment">Nova Remessa</button>
+            </div>
+        </div>
+
+        <div class="card">
+            <h3>Remessas Recentes</h3>
+            <table class="table">
+                <thead><tr><th>Tracking</th><th>Carrier</th><th>Origem</th><th>Destino</th><th>Estado</th></tr></thead>
+                <tbody id="logistics-shipments-tbody"><tr><td colspan="5" class="muted">Sem remessas</td></tr></tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- ======================
+         MODULE: GREAT MOLA (Investimentos)
+       ====================== -->
+    <div id="module-mola" class="module hidden">
+        <div class="module-header">
+            <h2>Great Mola — Investimentos</h2>
+            <p class="muted">Investir capital, calcular rendimentos e gerir pagamentos.</p>
+            <div class="module-actions">
+                <button class="btn" id="mola-new-invest">Novo Investimento</button>
+            </div>
+        </div>
+
+        <div class="card grid-2">
+            <div>
+                <h3>Resumo</h3>
+                <div>Total Investido: <strong id="mola-total">0 MZN</strong></div>
+                <div>Retorno Acumulado: <strong id="mola-returns">0 MZN</strong></div>
+            </div>
+            <div>
+                <h3>Simulador</h3>
+                <label>Capital</label>
+                <input id="mola-capital" type="number" value="1000" />
+                <label>Dias Úteis</label>
+                <input id="mola-days" type="number" value="30" />
+                <label>Taxa Diária (%)</label>
+                <input id="mola-rate" type="number" value="0.3" step="0.01" />
+                <div style="margin-top:8px">
+                    <button class="btn" id="mola-calc">Calcular</button>
+                </div>
+                <div id="mola-preview" class="muted" style="margin-top:8px">Previsão: —</div>
+            </div>
+        </div>
+
+        <div class="card">
+            <h3>Investimentos</h3>
+            <table class="table">
+                <thead><tr><th>Usuário</th><th>Capital</th><th>Dias</th><th>Net</th><th>Estado</th></tr></thead>
+                <tbody id="mola-list-tbody"><tr><td colspan="5" class="muted">Nenhum investimento</td></tr></tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- ======================
+         MODULE: SETTINGS
+       ====================== -->
+    <div id="module-settings" class="module hidden">
+        <div class="module-header">
+            <h2>Definições & Administração</h2>
+            <p class="muted">Configurações da plataforma, planos, pagamentos, gateways e segurança.</p>
+        </div>
+
+        <div class="card grid-2">
+            <div>
+                <h3>Conta</h3>
+                <label>Nome da Empresa</label>
+                <input id="cfg-company" />
+                <label>Moeda</label>
+                <select id="cfg-currency"><option>MZN</option><option>USD</option><option>EUR</option></select>
+            </div>
+            <div>
+                <h3>Segurança</h3>
+                <div><label><input type="checkbox" id="cfg-2fa" /> Habilitar 2FA para administradores</label></div>
+                <div style="margin-top:8px"><button class="btn" id="cfg-save">Guardar</button></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- END CONTENT AREA — footer & close section -->
+    </section>
+
+    <!-- FOOTER -->
+    <footer class="app-footer">
+        <div>© Great Nexus — Ecossistema Empresarial Inteligente</div>
+        <div class="muted">v0.1 • Desenvolvido para multi-tenant SaaS</div>
+    </footer>
+
+    </main>
+    </div>
+
+    <!-- ====== GLOBAL MODALS (empty, preenchidos via JS) ====== -->
+    <div id="global-modals"></div>
+
+    <!-- Scripts: placeholder — Parte 3 enviará o JS completo -->
+    <script src="js/app.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="js/ui.js"></script>
+    <script src="js/modules/dashboard.js"></script>
+    <script src="js/modules/erp.js"></script>
+    <script src="js/modules/crm.js"></script>
+    <script src="js/modules/mrp.js"></script>
+    <script src="js/modules/hr.js"></script>
+    <script src="js/modules/b2b.js"></script>
+    <script src="js/modules/logistics.js"></script>
+    <script src="js/modules/mola.js"></script>
+
             <section id="content-area" class="content-area">
 <!-- dashboard.html - módulo carregável -->
 <div class="dashboard-root">
