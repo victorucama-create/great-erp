@@ -1,0 +1,50 @@
+<!-- frontend/modules/invoices.html -->
+<div class="invoices-root">
+  <div class="module-header">
+    <div>
+      <h2>Vendas & Faturas</h2>
+      <p class="muted">Gerencie faturas, vendas POS, pagamentos e exportações.</p>
+    </div>
+    <div class="module-actions">
+      <button id="btnNewInvoice" class="btn"><i class="fa fa-plus"></i> Nova Fatura</button>
+      <button id="btnNewPos" class="btn ghost"><i class="fa fa-bolt"></i> POS Rápida</button>
+      <button id="btnExportCsv" class="btn ghost"><i class="fa fa-download"></i> Exportar CSV</button>
+    </div>
+  </div>
+
+  <div class="card search-panel">
+    <div style="display:flex;gap:8px;align-items:center">
+      <input id="invoiceSearch" placeholder="Pesquisar por número, cliente ou SKU..." style="flex:1;padding:10px;border-radius:8px;border:1px solid #e6eef8" />
+      <select id="filterStatus" style="padding:8px;border-radius:8px;border:1px solid #e6eef8">
+        <option value="">Todos estados</option>
+        <option value="draft">Draft</option>
+        <option value="pending">Pendente</option>
+        <option value="paid">Pago</option>
+        <option value="cancelled">Cancelado</option>
+      </select>
+      <button id="btnSearchInv" class="btn ghost"><i class="fa fa-search"></i></button>
+    </div>
+  </div>
+
+  <div class="card">
+    <table class="table" id="invoicesTable">
+      <thead>
+        <tr>
+          <th>Fatura</th>
+          <th>Cliente</th>
+          <th>Data</th>
+          <th>Total</th>
+          <th>Estado</th>
+          <th>Ações</th>
+        </tr>
+      </thead>
+      <tbody id="invoicesTbody"></tbody>
+    </table>
+  </div>
+
+  <!-- Modal container -->
+  <div id="invoiceModal" class="modal hidden"></div>
+</div>
+
+<link rel="stylesheet" href="src/styles/invoices.css">
+<script src="src/js/invoices.js"></script>
