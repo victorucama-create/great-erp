@@ -2,32 +2,44 @@
 require('dotenv').config();
 const express = require('express');
 const helmet = require('helmet');
+const rateLimit = require('express-rate-limit');
 const cors = require('cors');
 const morgan = require('morgan');
-const { PrismaClient } = require('@prisma/client');
 const path = require('path');
+const { connect } = require('./config/db');
 
-const prisma = new PrismaClient();
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// middlewares
-app.use(helmet());
-app.use(cors());
-app.use(morgan('tiny'));
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
+(async () => {
+  try {
+    await connect(process.env.MONGODB_URI);
+  } catch (err) {
+    console.error('Failed to connect to MongoDB', err);
+    process.exit(1);
+  }
 
-// static uploads (for dev)
-app.use('/uploads', express.static(path.join(__dirname, '../uploads')));
+  // middlewares
+  app.use(helmet());
+  app.use(cors());
+  app.use(morgan('tiny'));
+  app.use(express.json({ limit: '10mb' }));
+  app.use(express.urlencoded({ extended: true }));
+  const limiter = rateLimit({ windowMs: Number(process.env.RATE_LIMIT_WINDOW_MS || 60000), max: Number(process.env.RATE_LIMIT_MAX || 120) });
+  app.use(limiter);
 
-// mount module routes
-const productsRouter = require('./routes/products.routes');
-app.use('/api/v1/erp', productsRouter);
+  // static uploads for dev
+  app.use('/uploads', express.static(path.join(__dirname, '../uploads')));
 
-// health
-app.get('/health', (req, res) => res.json({ status: 'ok', ts: new Date().toISOString() }));
+  // routes
+  const apiRouter = require('./routes/index');
+  app.use('/api/v1', apiRouter);
 
-app.listen(PORT, () => {
-  console.log(`Great Nexus backend listening on port ${PORT}`);
-});
+  // health
+  app.get('/health', (req, res) => res.json({ status: 'ok', ts: new Date().toISOString() }));
+
+  app.listen(PORT, () => {
+    console.log(`Great Nexus backend (MongoDB) listening on port ${PORT}`);
+  });
+
+})();
