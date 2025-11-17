@@ -1,175 +1,100 @@
-// src/controllers/products.controller.js
-const { PrismaClient } = require('@prisma/client');
-const prisma = new PrismaClient();
-const { validationResult } = require('express-validator');
-const csvStringify = require('csv-stringify/lib/sync');
-const fs = require('fs');
-const path = require('path');
+// controllers/products.controller.js
+const Product = require('../models/Product');
+const Stock = require('../models/Stock');
+const StockMovement = require('../models/StockMovement');
+const Attachment = require('../models/Attachment');
+const { applyTenant } = require('../utils/tenantUtil');
 
 async function listProducts(req, res) {
   try {
-    const tenantId = req.user.tenantId || null; // payload must include tenantId in real impl
-    const where = tenantId ? { where: { tenantId } } : {};
-    const products = await prisma.product.findMany(Object.assign({}, where, { include: { attachments:true } }));
+    const filter = applyTenant({}, req.tenantFilter);
+    const products = await Product.find(filter).populate('attachments').lean();
     return res.json({ success:true, data: products });
   } catch (err) {
-    console.error(err);
-    return res.status(500).json({ success:false, error: 'server_error' });
+    console.error(err); return res.status(500).json({ success:false, error:'server_error'});
   }
 }
 
 async function getProduct(req, res) {
   try {
-    const { id } = req.params;
-    const product = await prisma.product.findUnique({ where: { id }, include: { attachments:true, stocks:true }});
+    const id = req.params.id;
+    const product = await Product.findById(id).populate('attachments').lean();
     if (!product) return res.status(404).json({ success:false, error:'not_found' });
-    return res.json({ success:true, data:product });
-  } catch (err) {
-    console.error(err);
-    return res.status(500).json({ success:false });
-  }
+    return res.json({ success:true, data: product });
+  } catch (err) { console.error(err); return res.status(500).json({ success:false }); }
 }
 
 async function createProduct(req, res) {
   try {
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) return res.status(400).json({ success:false, errors: errors.array() });
-    const { sku, name, description, category, costPrice, salePrice, wholesalePrice, reorderLevel } = req.body;
-    const tenantId = req.user.tenantId || req.body.tenantId || null;
-
-    const product = await prisma.product.create({
-      data: {
-        sku, name, description, category,
-        costPrice: costPrice || 0,
-        salePrice: salePrice || 0,
-        wholesalePrice: wholesalePrice || 0,
-        reorderLevel: reorderLevel || 0,
-        tenantId: tenantId
-      }
-    });
-    return res.json({ success:true, data: product });
-  } catch (err) {
-    console.error(err);
-    return res.status(500).json({ success:false, error:'server_error' });
-  }
+    const payload = req.body;
+    payload.tenantId = req.user.role === 'super_admin' ? payload.tenantId : req.user.tenantId;
+    const p = await Product.create(payload);
+    return res.json({ success:true, data: p });
+  } catch (err) { console.error(err); return res.status(500).json({ success:false, error:'server_error' }); }
 }
 
 async function updateProduct(req, res) {
   try {
-    const { id } = req.params;
+    const id = req.params.id;
     const payload = req.body;
-    const prod = await prisma.product.update({ where: { id }, data: payload });
-    return res.json({ success:true, data: prod });
-  } catch (err) {
-    console.error(err);
-    return res.status(500).json({ success:false, error: 'server_error' });
-  }
+    const p = await Product.findByIdAndUpdate(id, payload, { new: true });
+    return res.json({ success:true, data: p });
+  } catch (err) { console.error(err); return res.status(500).json({ success:false }); }
 }
 
 async function deleteProduct(req, res) {
   try {
-    const { id } = req.params;
-    await prisma.product.delete({ where: { id } });
-    return res.json({ success:true, message: 'deleted' });
-  } catch (err) {
-    console.error(err);
-    return res.status(500).json({ success:false, error:'server_error' });
-  }
+    const id = req.params.id;
+    await Product.findByIdAndDelete(id);
+    return res.json({ success:true, message:'deleted' });
+  } catch (err) { console.error(err); return res.status(500).json({ success:false }); }
 }
 
 async function uploadAttachment(req, res) {
   try {
-    const { id } = req.params; // product id
+    const id = req.params.id; // product id
     const file = req.file;
     if (!file) return res.status(400).json({ success:false, error:'no_file' });
 
-    const url = `/uploads/${file.filename}`;
-    const attachment = await prisma.attachment.create({
-      data: {
-        productId: id,
-        filename: file.originalname,
-        url,
-        mimeType: file.mimetype,
-        size: file.size
-      }
+    const at = await Attachment.create({
+      tenantId: req.user.tenantId,
+      refType: 'product',
+      refId: id,
+      filename: file.originalname,
+      url: `/uploads/${file.filename}`,
+      mimeType: file.mimetype,
+      size: file.size
     });
 
-    // update product attachment count / optional
-    return res.json({ success:true, data: attachment });
-  } catch (err) {
-    console.error(err);
-    return res.status(500).json({ success:false, error:'server_error' });
-  }
+    await Product.findByIdAndUpdate(id, { $push: { attachments: at._id }});
+    return res.json({ success:true, data: at });
+  } catch (err) { console.error(err); return res.status(500).json({ success:false }); }
 }
 
 async function createStockMovement(req, res) {
   try {
     const { productId, warehouseId, type, qty, reference, reason } = req.body;
-    // create movement
-    const movement = await prisma.stockMovement.create({
-      data: { productId, warehouseId, type, qty: Number(qty), reference, reason, createdBy: req.user.id }
-    });
-
-    // update stock qty in Stock record (simple logic)
-    const stock = await prisma.stock.findFirst({ where: { productId, warehouseId }});
+    const movement = await StockMovement.create({ productId, warehouseId, type, qty, reference, reason, createdBy: req.user.id, tenantId: req.user.tenantId });
+    // update stock
+    let stock = await Stock.findOne({ productId, warehouseId });
     let newQty = (stock?.qty || 0);
-    if (type === 'IN') newQty = newQty + Number(qty);
+    if (type === 'IN') newQty += Number(qty);
     else if (type === 'OUT') newQty = Math.max(0, newQty - Number(qty));
-    else if (type === 'ADJUSTMENT') newQty = Number(qty); // full override
-    else if (type === 'TRANSFER') {
-      // transfer logic should update source and destination separately (not implemented here)
-    }
+    else if (type === 'ADJUSTMENT') newQty = Number(qty);
 
-    if (stock) {
-      await prisma.stock.update({ where: { id: stock.id }, data: { qty: newQty }});
-    } else {
-      await prisma.stock.create({ data: { productId, warehouseId, qty: newQty }});
-    }
+    if (stock) stock.qty = newQty, await stock.save();
+    else stock = await Stock.create({ productId, warehouseId, qty: newQty });
 
-    // optional: update product.stockTotal (aggregate)
-    const total = await prisma.stock.aggregate({ _sum: { qty: true }, where: { productId }});
-    await prisma.product.update({ where: { id: productId }, data: { stockTotal: Number(total._sum.qty || 0) }});
+    // update product stockTotal
+    const aggregated = await Stock.aggregate([
+      { $match: { productId: stock.productId } },
+      { $group: { _id: '$productId', sumQty: { $sum: '$qty' } } }
+    ]);
+    const total = aggregated[0] ? aggregated[0].sumQty : 0;
+    await Product.findByIdAndUpdate(productId, { stockTotal: total });
 
     return res.json({ success:true, data: movement });
-  } catch (err) {
-    console.error(err);
-    return res.status(500).json({ success:false, error:'server_error' });
-  }
+  } catch (err) { console.error(err); return res.status(500).json({ success:false }); }
 }
 
-async function getStockByProduct(req, res) {
-  try {
-    const { productId } = req.params;
-    const stocks = await prisma.stock.findMany({ where: { productId }, include: { warehouse: true }});
-    return res.json({ success:true, data: stocks });
-  } catch (err) {
-    console.error(err);
-    return res.status(500).json({ success:false, error: 'server_error' });
-  }
-}
-
-async function exportProductsCsv(req, res) {
-  try {
-    const products = await prisma.product.findMany();
-    const rows = products.map(p => ({
-      id: p.id,
-      sku: p.sku,
-      name: p.name,
-      category: p.category || '',
-      price: p.salePrice?.toString() || '0',
-      stock: p.stockTotal || 0
-    }));
-    const csv = csvStringify(rows, { header: true });
-    res.setHeader('Content-disposition', 'attachment; filename=products.csv');
-    res.set('Content-Type', 'text/csv');
-    res.status(200).send(csv);
-  } catch (err) {
-    console.error(err);
-    return res.status(500).json({ success:false, error:'server_error' });
-  }
-}
-
-module.exports = {
-  listProducts, getProduct, createProduct, updateProduct, deleteProduct,
-  uploadAttachment, createStockMovement, getStockByProduct, exportProductsCsv
-};
+module.exports = { listProducts, getProduct, createProduct, updateProduct, deleteProduct, uploadAttachment, createStockMovement };
