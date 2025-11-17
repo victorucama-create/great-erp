@@ -1,0 +1,13 @@
+/* frontend/src/styles/invoices.css */
+.invoices-root .module-header{display:flex;justify-content:space-between;align-items:center;gap:12px}
+.invoices-root .module-header h2{margin:0}
+.invoices-root .muted{color:#6b7280;margin-top:4px}
+.module-actions{display:flex;gap:8px}
+.table{width:100%;border-collapse:collapse}
+.table thead th{background:#fbfdff;padding:10px;text-align:left;border-bottom:1px solid #eef2f6}
+.table tbody td{padding:10px;border-bottom:1px solid #f1f5f9}
+.btn.small{padding:6px 8px;font-size:13px}
+.btn.ghost{background:transparent;border:1px solid rgba(15,23,36,0.06)}
+.modal{position:fixed;left:0;right:0;top:0;bottom:0;display:flex;align-items:center;justify-content:center;z-index:100;background:rgba(10,12,16,0.3)}
+.hidden{display:none}
+.card{background:white;padding:14px;border-radius:12px;box-shadow:0 10px 30px rgba(2,6,23,0.08)}
