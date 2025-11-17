@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="pt">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Great Nexus — Painel</title>
+  <meta name="description" content="Great Nexus - SuperDashboard" />
+  <link rel="stylesheet" href="src/styles/base.css">
+  <link rel="stylesheet" href="src/styles/dashboard.css">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+  <div id="gn-app" class="gn-app">
+    <!-- SIDEBAR -->
+    <aside class="gn-sidebar" role="navigation" aria-label="Main menu">
+      <div class="gn-brand">
+        <div class="gn-logo">GN</div>
+        <div class="gn-title">
+          <div class="name">Great Nexus</div>
+          <div class="muted">Ecossistema Empresarial</div>
+        </div>
+      </div>
+
+      <nav class="gn-menu" id="gnMenu">
+        <a href="#" class="gn-item active" data-module="dashboard"> <i class="fa fa-home"></i> Dashboard</a>
+        <a href="#" class="gn-item" data-module="products"> <i class="fa fa-cubes"></i> Produtos</a>
+        <a href="#" class="gn-item" data-module="sales"> <i class="fa fa-shopping-cart"></i> Vendas</a>
+        <a href="#" class="gn-item" data-module="inventory"> <i class="fa fa-warehouse"></i> Inventário</a>
+        <div class="gn-divider"></div>
+        <a href="#" class="gn-item" data-module="mrp"><i class="fa fa-industry"></i> MRP</a>
+        <a href="#" class="gn-item" data-module="crm"><i class="fa fa-user-friends"></i> CRM</a>
+        <a href="#" class="gn-item" data-module="hr"><i class="fa fa-id-badge"></i> RH</a>
+        <div class="gn-divider"></div>
+        <a href="#" class="gn-item" data-module="mola"><i class="fa fa-wallet"></i> Great Mola</a>
+        <a href="#" class="gn-item" data-module="b2b"><i class="fa fa-handshake"></i> B2B</a>
+        <div class="gn-spacer"></div>
+        <div class="gn-sidebar-footer">
+          <select id="gnLang" title="Language" aria-label="Idioma">
+            <option value="pt">PT</option>
+            <option value="en">EN</option>
+          </select>
+          <button id="gnLogout" class="btn-ghost">Sair</button>
+        </div>
+      </nav>
+    </aside>
+
+    <!-- MAIN -->
+    <main class="gn-main" id="gnMain" role="main">
+      <header class="gn-topbar">
+        <div class="gn-search">
+          <input id="gnSearch" placeholder="Pesquisar (produto, cliente, fatura)..." />
+          <button id="btnSearch" title="Pesquisar"><i class="fa fa-search"></i></button>
+        </div>
+        <div class="gn-top-actions">
+          <div class="kpi-small"> Vendas Hoje <strong id="kpi-sales-today">—</strong></div>
+          <div class="kpi-small"> Caixa <strong id="kpi-cash">—</strong></div>
+          <div class="user-box"> <i class="fa fa-user-circle"></i> <span id="gnUserName">Utilizador</span></div>
+        </div>
+      </header>
+
+      <section id="gnContent" class="gn-content">
+        <!-- Aqui os módulos vão ser carregados dinamicamente -->
+        <div class="gn-loading-card">
+          <div class="spinner"></div>
+          <p>Carregando painel...</p>
+        </div>
+      </section>
+
+      <footer class="gn-footer">
+        <small>© <span id="gnYear"></span> Great Nexus — Versão beta</small>
+      </footer>
+    </main>
+  </div>
+
+  <script src="src/js/api.js"></script>
+  <script src="src/js/app.js"></script>
+  <script src="src/js/dashboard.js"></script>
+</body>
+</html>
