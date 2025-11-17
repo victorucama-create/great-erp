@@ -1,0 +1,12 @@
+/* dashboard.css */
+.dashboard-root{display:flex;flex-direction:column;gap:12px}
+.dashboard-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px}
+.dashboard-actions{display:flex;gap:8px}
+.dashboard-grid{display:grid;grid-template-columns:2fr 1fr;gap:12px}
+.kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+.kpi-card{background:linear-gradient(180deg,#fff,#fbfdff);padding:14px;border-radius:10px;border:1px solid #e6eef8;display:flex;flex-direction:column;gap:8px}
+.kpi-title{color:var(--muted);font-size:13px}
+.kpi-value{font-weight:800;font-size:1.35rem}
+.charts{display:flex;flex-direction:column;gap:12px}
+.side-cards{display:flex;flex-direction:column;gap:12px}
+.card h3, .card h4{margin:0 0 8px 0}
